@@ -45,6 +45,7 @@ import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
 import com.baidu.mapapi.search.route.BikingRouteResult;
+import com.baidu.mapapi.search.route.DrivingRouteLine;
 import com.baidu.mapapi.search.route.DrivingRoutePlanOption;
 import com.baidu.mapapi.search.route.DrivingRouteResult;
 import com.baidu.mapapi.search.route.IndoorRouteResult;
@@ -56,6 +57,7 @@ import com.baidu.mapapi.search.route.RoutePlanSearch;
 import com.baidu.mapapi.search.route.TransitRouteLine;
 import com.baidu.mapapi.search.route.TransitRoutePlanOption;
 import com.baidu.mapapi.search.route.TransitRouteResult;
+import com.baidu.mapapi.search.route.WalkingRouteLine;
 import com.baidu.mapapi.search.route.WalkingRoutePlanOption;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.peixing.baidumapdemo.overlayutils.DrivingRouteOverlay;
@@ -433,6 +435,14 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
             }
             if (walkingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
                 WalkingRouteOverlay overlay = new WalkingRouteOverlay(mbaiduMap);
+                for (WalkingRouteLine walkingRouteLine : walkingRouteResult.getRouteLines()) {
+                    for (WalkingRouteLine.WalkingStep walkingStep : walkingRouteLine.getAllStep()) {
+                        Log.i(TAG, "onGetWalkingRouteResult: " + walkingStep.getInstructions());
+                    }
+                    Log.i(TAG, "onGetWalkingRouteResult: ---------");
+                }
+
+
                 overlay.setData(walkingRouteResult.getRouteLines().get(0));
                 overlay.addToMap();
                 overlay.zoomToSpan();
@@ -449,10 +459,14 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
             }
             if (transitRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
                 TransitRouteOverlay overlay = new TransitRouteOverlay(mbaiduMap);
-              /*  for (TransitRouteLine transitRouteLine : transitRouteResult.getRouteLines()) {
-                    overlay.setData(transitRouteLine);
-                    overlay.addToMap();
-                }*/
+                for (TransitRouteLine transitRouteLine : transitRouteResult.getRouteLines()) {
+
+                    for (TransitRouteLine.TransitStep step : transitRouteLine.getAllStep()) {
+
+                        Log.i(TAG, "onGetTransitRouteResult: " + step.getInstructions());
+                    }
+                    Log.i(TAG, "onGetTransitRouteResult: --------------");
+                }
                 overlay.setData(transitRouteResult.getRouteLines().get(0));
 //                Log.i(TAG, "onGetTransitRouteResult: " + transitRouteResult.getRouteLines().get(0).getDistance());
 
@@ -481,6 +495,13 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
             }
             if (drivingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
                 DrivingRouteOverlay overlay = new DrivingRouteOverlay(mbaiduMap);
+                for (DrivingRouteLine drivingRouteLine : drivingRouteResult.getRouteLines()) {
+                    for (DrivingRouteLine.DrivingStep drivingStep : drivingRouteLine.getAllStep()) {
+                        Log.i(TAG, "onGetDrivingRouteResult: " + drivingStep.getInstructions());
+                    }
+                    Log.i(TAG, "onGetDrivingRouteResult: -------------");
+                }
+
                 overlay.setData(drivingRouteResult.getRouteLines().get(0));
                 overlay.addToMap();
                 overlay.zoomToSpan();
@@ -528,7 +549,7 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
                 mRoutePlanSearch.transitSearch(new TransitRoutePlanOption()
                         .city("北京")
                         .from(PlanNode.withLocation(myLatlng))
-                        .to(PlanNode.withLocation(mPoiPosition)));
+                        .to(PlanNode.withLocation(mPoiPosition)).policy(TransitRoutePlanOption.TransitPolicy.EBUS_TRANSFER_FIRST));
                 Toast.makeText(getApplicationContext(), "正在规划公交路线。。。。",
                         Toast.LENGTH_SHORT).show();
                 break;
@@ -538,6 +559,7 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
                 PlanNode stNode = PlanNode.withLocation(myLatlng);
                 PlanNode enNode = PlanNode.withLocation(mPoiPosition);
                 option.from(stNode).to(enNode);
+                option.policy(DrivingRoutePlanOption.DrivingPolicy.ECAR_TIME_FIRST);
                 mRoutePlanSearch.drivingSearch(option);
                 Toast.makeText(getApplicationContext(), "正在规划驾车路线。。。。",
                         Toast.LENGTH_SHORT).show();
