@@ -34,11 +34,11 @@ public class MapActivity extends BaseActivity {
         //普通地图
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
        /* //卫星地图
-        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
+//        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
         //空白地图
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NONE);*/
         //设置试试交通图
-//        mBaiduMap.setTrafficEnabled(true);
+        mBaiduMap.setTrafficEnabled(true);
         //开启百度城市热力图
 //        mBaiduMap.setBaiduHeatMapEnabled(true);
         //设置地图缩放级别

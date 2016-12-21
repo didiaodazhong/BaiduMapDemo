@@ -45,7 +45,7 @@
 
     <LinearLayout
         android:id="@+id/ll_route"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dip"

@@ -36,6 +36,7 @@ import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.core.RouteLine;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
 import com.baidu.mapapi.search.poi.PoiDetailResult;
@@ -80,6 +81,8 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
     LatLng mPoiPosition;
 
     BaiduMap mbaiduMap;
+
+    boolean isFirstLoc = true; // 是否首次定位
 
     /**
      * 路线规划搜索器
@@ -212,6 +215,7 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
         //  设置地图的点击事件
         mbaiduMap.setOnMapClickListener(onMapClickListener);
 
+        mbaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
     }
 
     /**
@@ -223,7 +227,7 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
         LocationClientOption options = new LocationClientOption();
         options.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         options.setCoorType("bd0911");// 可选，默认gcj02，设置返回的定位结果坐标系 bd0911
-        options.setScanSpan(5000);  //刷新频率
+        options.setScanSpan(6000);  //刷新频率
         mLocationClient.setLocOption(options);
 //        Log.i(TAG, "initLocation: 开启定位");
         //定位图层点击监听事件
@@ -234,7 +238,7 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
         mbaiduMap.setMyLocationEnabled(true);
         //设置显示的定位图层配置
         MyLocationConfiguration config = new MyLocationConfiguration(
-                MyLocationConfiguration.LocationMode.NORMAL, false, null);
+                MyLocationConfiguration.LocationMode.NORMAL, true, null);
         mbaiduMap.setMyLocationConfigeration(config);
 
         MapStatusUpdate status = MapStatusUpdateFactory.zoomTo(16);
@@ -274,12 +278,15 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
             mbaiduMap.addOverlay(options);*/
             mbaiduMap.setMyLocationData(locData);
 
-            MapStatus.Builder builder = new MapStatus.Builder();
-            builder.target(myLatlng);
-            mbaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-            //定位设置模式修改
-            MyLocationConfiguration config = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, false, null);
-            mbaiduMap.setMyLocationConfigeration(config);
+            if (isFirstLoc) {
+                isFirstLoc = false;
+                MapStatus.Builder builder = new MapStatus.Builder();
+                builder.target(myLatlng).zoom(16);
+                mbaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+                //定位设置模式修改
+//            MyLocationConfiguration config = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, null);
+//            mbaiduMap.setMyLocationConfigeration(config);
+            }
         }
     };
 
@@ -302,6 +309,10 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
         @Override
         public void onMapClick(LatLng latLng) {
             mbaiduMap.clear();
+
+            //路线规划
+            llRoute.setVisibility(View.GONE);
+
             //构建图标
 
             //绘制原型覆盖物
@@ -347,6 +358,8 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
                     .fontColor(0x60ff0000).visible(true);
             mbaiduMap.addOverlay(textOptions);
 
+            //路线规划
+            llRoute.setVisibility(View.VISIBLE);
 
             Log.i(TAG, "onMapPoiClick: 名字是:" + mapPoi.getName() + ",经度是:" + mapPoi.getPosition().longitude + ",纬度是:" + mapPoi.getPosition().latitude);
             return true;
@@ -436,11 +449,16 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
             }
             if (transitRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
                 TransitRouteOverlay overlay = new TransitRouteOverlay(mbaiduMap);
+              /*  for (TransitRouteLine transitRouteLine : transitRouteResult.getRouteLines()) {
+                    overlay.setData(transitRouteLine);
+                    overlay.addToMap();
+                }*/
                 overlay.setData(transitRouteResult.getRouteLines().get(0));
 //                Log.i(TAG, "onGetTransitRouteResult: " + transitRouteResult.getRouteLines().get(0).getDistance());
 
                 List<TransitRouteLine.TransitStep> steps = transitRouteResult.getRouteLines().get(0).getAllStep();
                 for (TransitRouteLine.TransitStep step : steps) {
+
                     Log.i(TAG, "onGetTransitRouteResult: " + step.getInstructions());
                 }
                 overlay.addToMap();
@@ -490,12 +508,12 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
                         : BaiduMap.MAP_TYPE_SATELLITE);
                 break;
             case R.id.bt_traffic:
+//                mbaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
                 mbaiduMap.setTrafficEnabled(!mbaiduMap.isTrafficEnabled());
                 break;
             case R.id.bt_myloc:
                 //获取位置
 //                getPermission();
-
                 break;
             case R.id.bt_walk:
                 mbaiduMap.clear();
@@ -543,7 +561,6 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
         mapView.onPause();
         //  LocationClient 停止
         mLocationClient.stop();
-
         super.onPause();
     }
 
@@ -559,6 +576,4 @@ public class MyLocationActivity extends Activity implements View.OnClickListener
 //        mRoutePlanSearch.destroy();
         super.onDestroy();
     }
-
-
 }
