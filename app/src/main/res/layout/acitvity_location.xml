@@ -1,0 +1,83 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity" >
+
+    <RelativeLayout
+        android:id="@+id/layout_nomal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <!-- TODO 添加地图控件 -->
+
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/bt_traffic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="交通图" />
+
+            <Button
+                android:id="@+id/bt_satellite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="卫星图" />
+
+            <Button
+                android:id="@+id/bt_myloc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="我的位置" />
+        </LinearLayout>
+    </RelativeLayout>
+    <!-- 路线规划的布局 默认隐藏 -->
+
+    <LinearLayout
+        android:id="@+id/ll_route"
+        android:visibility="visible"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dip"
+        android:layout_marginTop="5dip"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/bt_drive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dip"
+            android:layout_marginRight="2dip"
+            android:layout_weight="1.0"
+            android:text="驾车搜索" />
+
+        <Button
+            android:id="@+id/bt_transit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dip"
+            android:layout_marginRight="2dip"
+            android:layout_weight="1.0"
+            android:text="公交搜索" />
+
+        <Button
+            android:id="@+id/bt_walk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dip"
+            android:layout_marginRight="2dip"
+            android:layout_weight="1.0"
+            android:text="步行搜索" />
+    </LinearLayout>
+
+</FrameLayout>
